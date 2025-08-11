@@ -12,7 +12,7 @@ Then it's just `notebookify args` in git bash.
 
 ## Usage
 
-#### To convert synapse json files to python notebooks:
+#### To convert synapse json files to valid notebooks:
 
     python notebookify.py file1.json file2.json file3.json ...
 
@@ -21,7 +21,7 @@ or to convert all (could be a little excessive):
     python notebookify.py *.json
 
 
-#### To convert all notebooks in the working dir back to json:
+#### To convert all _LOCAL.ipynb notebooks in the working dir back to synapse json:
 
     python notebookify.py -j
  
