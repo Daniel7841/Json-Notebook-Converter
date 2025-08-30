@@ -1,3 +1,4 @@
+import argparse
 import json
 from json import *
 import sys
@@ -86,7 +87,7 @@ def cleanupCells(cells):
         if 'metadata' in cell.keys():
             newCell['metadata'] = eval('''{"jupyter": {"source_hidden": False,"outputs_hidden": False},"nteract": {"transient": {"deleting": False}},"collapsed": False},''')
             #newCell['metadata'] = eval('''{"acollapsed": False, "jupyter": {"asource_hidden": False,"outputs_hidden": False},"nteract": {"transient": {"deleting": False}}},''')
-            
+
         newCell['source'] = cell.pop('source')
         if 'execution_count' in cell.keys():
             newCell['execution_count'] = cell.pop('execution_count')
@@ -106,7 +107,7 @@ def dealphabetizeJsonKeys(fileName):
             #lines.append(line.replace('acollapsed', 'collapsed').replace('asource_hidden','source_hidden'))
     except:
         print(f"error writing to json file {fileName}")
-    
+
 
 def jsonifyNotebooks():
     print(f"searching for LOCAL files in {os.getcwd()}")
@@ -118,7 +119,7 @@ def jsonifyNotebooks():
     for localFile in localFiles:
         origFileName = localFile[0:-len(LOCAL_NOTEBOOK_FILE_ENDING)]
         metaFile = origFileName + JSON_METADATA_FILE_ENDING
-        
+
         if metaFile in metaFiles:
             notebook = importJson(localFile)
             metaJson = importJson(metaFile)
@@ -128,13 +129,13 @@ def jsonifyNotebooks():
             if 'name' not in metaJson.keys():
                 metaJson['name'] = origFileName
                 print(f'No name field for {localFile}. Generating from filename.')
-                
+
             if 'properties' not in metaJson.keys():
                 print("error: no properties found on metadata object")
                 continue
-            
+
             metaJson['properties']['cells'] = cleanupCells(notebook['cells'])
-            
+
             exportJson(origFileName + ".json", metaJson)
         else:
             print(f"missing metadata file for {origFileName}. Skipping")
@@ -144,13 +145,13 @@ def jsonifyNotebooks():
 ##Program Start Point
 i = 0
 if len(sys.argv) == 1:
-    print("USAGE: python notebookify.py [json_file_1] [json_file_2] ... ")
-    print("Or to convert notebooks to json: python notebookify.py -j")
+    print("USAGE:\n\tpython notebookify.py [json_file_1] [json_file_2] ... ")
+    print("Or to convert notebooks to json:\n\tpython notebookify.py -j")
     print("\tThis will combine each file named *_LOCAL.ipynb with its _METADATA.json file")
 elif (len(sys.argv) > 1 and sys.argv[1].startswith('-j')):
     jsonifyNotebooks()
     sys.exit()
-    
+
 workingDirFiles = os.listdir('.')
 for arg in sys.argv:
     if i > 0: 
@@ -161,12 +162,12 @@ for arg in sys.argv:
             #anything but yes we skip this file.
             if not goOn.lower().startswith('y'):
                 continue #ironically, continuing the loop means skipping the file.
-        
+
         if arg.endswith(JSON_METADATA_FILE_ENDING):
             print(f"METADATA file {arg} found. Skipping.")
             continue
         currentJson = importJson(arg)
-        
+
         cells = currentJson['properties'].pop('cells')
         for cell in cells:
             if 'metadata' not in cell.keys():
@@ -177,6 +178,37 @@ for arg in sys.argv:
         #cells go to the notebook object, everything else to the metadata object
         exportMetadata(arg, currentJson)
         exportNotebook(arg, cells)
-        
+
     else:
         i += 1
+
+
+
+# def get_local_ipynb_files():
+#     return [f for f in os.listdir('.') if f.endswith('_LOCAL.ipynb')]
+
+# def main():
+#     parser = argparse.ArgumentParser(description="Process JSON or _LOCAL.ipynb files.")
+#     parser.add_argument('-jsonify', action='store_true', help='Switch to processing _LOCAL.ipynb files')
+#     parser.add_argument('files', nargs='*', help='List of files to process')
+
+#     args = parser.parse_args()
+
+#     if args.jsonify:
+#         if args.files:
+#             files_to_process = [f for f in args.files if f.endswith('_LOCAL.ipynb')]
+#         else:
+#             files_to_process = get_local_ipynb_files()
+#     else:
+#         files_to_process = args.files
+
+#     if not files_to_process:
+#         print("No valid files provided.")
+#         sys.exit(1)
+
+#     print("Files to process:")
+#     for file in files_to_process:
+#         print(f" - {file}")
+
+# if __name__ == "__main__":
+#     main()
