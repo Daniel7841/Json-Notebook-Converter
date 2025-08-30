@@ -4,15 +4,28 @@ A small script to convert between valid jupyter python notebooks (.ipynb) and th
 ## Installation
 Save the script to your machine. Then you can either add its folder to your path variable or create an alias to it for easy access.
 
-I use git bash, so I have this in my `aliases.sh` for the shortest usage:
+## Aliasing
+### In git bash
+Add this to your `aliases.sh` file:
 
-    alias notebookify='python C:/Dir/To/Script/notebookify.py'
+    alias notebookify='python C:/Path/To/Script/notebookify.py'
 
-Then it's just `notebookify args` in git bash.
+### In Powershell
+Run this to open your powershell profile script:
+```powershell
+notepad $PROFILE
+```
+Add this to the script and save it.
+```powershell
+function notebookify {
+    & python "C:/Path/To/Script/notebookify.py" @args
+}
+```
 
+Then it's just `notebookify` instead of `python notebookify.py` to use.
 ## Usage
 
-#### To convert synapse json files to python notebooks:
+#### To convert synapse json files to valid notebooks:
 
     python notebookify.py file1.json file2.json file3.json ...
 
@@ -21,7 +34,7 @@ or to convert all (could be a little excessive):
     python notebookify.py *.json
 
 
-#### To convert all notebooks in the working dir back to json:
+#### To convert all _LOCAL.ipynb notebooks in the working dir back to synapse json:
 
     python notebookify.py -j
  
